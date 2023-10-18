@@ -13,7 +13,7 @@ const App = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "http://nmwa-api:8888/wp-json/tapping/v1/members"
+          "https://leon.tappingbones.works/wp-json/tapping/v1/members"
         );
         const jsonData = await response.json();
         setData(jsonData);
