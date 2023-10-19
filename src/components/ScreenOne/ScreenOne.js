@@ -23,7 +23,6 @@ const ScreenOne = ({ data }) => {
     }
   }, [level, levelLength, dataSetKeyIndex, allDataSetKeys.length]);
 
-
   // console.log('dataSetKeyIndex: ', dataSetKeyIndex, datasetkey, levelLength, 'level: ', level);
 
   return (
@@ -41,7 +40,7 @@ const ScreenOne = ({ data }) => {
             startDelay={0}
             endDelay={2000}
             onComplete={onComplete}
-            speed={40}
+            speed={150}
             fadeInOutDuration={1.5}
           >
             <div className="columns-container" id={datasetkey + "-" + level}>
@@ -49,9 +48,7 @@ const ScreenOne = ({ data }) => {
             </div>
           </AutoScrollingComponent>
         </div>
-
       </div>
-
     </div>
   );
 };
@@ -61,7 +58,7 @@ const AutoScrollingComponent = ({
   startDelay = 0,
   endDelay = 0,
   onComplete,
-  speed = 50,
+  speed = 70,
   fadeInOutDuration = 0.5,
 }) => {
   const containerRef = useRef(null);
@@ -70,18 +67,16 @@ const AutoScrollingComponent = ({
     let columnHeight = containerRef.current.offsetHeight;
     columnHeight =
       columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
-    const finalY =
-      -columnHeight + window.innerHeight;
+    const finalY = -columnHeight + window.innerHeight;
     const bottomToTopDuration = (finalY * -1 * animationSpeed) / 10000;
     const isRightToLeft = finalY === 0;
     const startX = isRightToLeft ? 25 : 0;
-
 
     const context = gsap.context(() => {
       const tl = gsap.timeline({
         delay: startDelay / 1000,
         onComplete: () => {
-          console.log("oncomplete")
+          console.log("oncomplete");
           if (typeof onComplete === "function") {
             setTimeout(() => {
               onComplete();
@@ -103,7 +98,6 @@ const AutoScrollingComponent = ({
           ease: "linear",
           paused: false,
         });
-
       } else {
         tl.to(containerRef.current, {
           duration: bottomToTopDuration,
@@ -111,19 +105,23 @@ const AutoScrollingComponent = ({
           ease: "linear",
           paused: false,
         });
-
       }
 
       tl.play();
-
-    })
-
+    });
 
     return () => {
       context.revert();
-    }
+    };
     // tl.play();
-  }, [containerRef, startDelay, endDelay, onComplete, speed, fadeInOutDuration]);
+  }, [
+    containerRef,
+    startDelay,
+    endDelay,
+    onComplete,
+    speed,
+    fadeInOutDuration,
+  ]);
 
   return (
     <div className="aniamtion-container" ref={containerRef}>
@@ -135,37 +133,29 @@ const AutoScrollingComponent = ({
 const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
   // console.log('InfoColumn: ', allDataSetKeys, activeKeyIndex, data, level)
   const getDsetsAndLevels = () => {
-    return allDataSetKeys
-      .map((dskey, index) => {
-        const isActive = index === activeKeyIndex;
-        const subDataSet = data[allDataSetKeys[index]];
-        const campaignInfoData = subDataSet["campaignInfo"][0];
-        const levelData = subDataSet["levels"][level];
-        return (
-          <div key={index} className={isActive ? "active" : ""}>
-            <h2 className="set-title">
-              {campaignInfoData["title"]
-                ? campaignInfoData["title"]
-                : ""}
-            </h2>
-            {
-              isActive ? <>
-                <h3 className="level-title">
-                  {levelData["title"]
-                    ? levelData["title"]
-                    : ""}
-                </h3>
-                <h4 className="level-desc">
-                  {levelData["description"]
-                    ? levelData["description"]
-                    : ""}
-                </h4>
-              </>
-                : null
-            }
-          </div>
-        );
-      });
+    return allDataSetKeys.map((dskey, index) => {
+      const isActive = index === activeKeyIndex;
+      const subDataSet = data[allDataSetKeys[index]];
+      const campaignInfoData = subDataSet["campaignInfo"][0];
+      const levelData = subDataSet["levels"][level];
+      return (
+        <div key={index} className={isActive ? "active" : ""}>
+          <h2 className="set-title">
+            {campaignInfoData["title"] ? campaignInfoData["title"] : ""}
+          </h2>
+          {isActive ? (
+            <>
+              <h3 className="level-title">
+                {levelData["title"] ? levelData["title"] : ""}
+              </h3>
+              <h4 className="level-desc">
+                {levelData["description"] ? levelData["description"] : ""}
+              </h4>
+            </>
+          ) : null}
+        </div>
+      );
+    });
   };
 
   return (
