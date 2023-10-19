@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import Logo from "../../assets/NMWA-logo.svg";
 import "./ScreenOne.scss";
 
@@ -39,9 +39,9 @@ const ScreenOne = ({ data }) => {
           <AutoScrollingComponent
             key={datasetkey + "-" + level}
             startDelay={0}
-            endDelay={0}
+            endDelay={2000}
             onComplete={onComplete}
-            speed={2}
+            speed={40}
             fadeInOutDuration={1.5}
           >
             <div className="columns-container" id={datasetkey + "-" + level}>
@@ -66,14 +66,17 @@ const AutoScrollingComponent = ({
 }) => {
   const containerRef = useRef(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const animationSpeed = speed;
     let columnHeight = containerRef.current.offsetHeight;
     columnHeight =
       columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
     const duration = (columnHeight * animationSpeed) / 10000;
     const finalY =
-      -columnHeight - containerRef.current.offsetTop + window.innerHeight;
+      -columnHeight + window.innerHeight;
+    const isRightToLeft = finalY === 0;
+    const startX = isRightToLeft ? 25 : 0;
+    console.log(finalY);
 
     const tl = gsap.timeline({
       delay: startDelay / 1000,
@@ -92,12 +95,26 @@ const AutoScrollingComponent = ({
       ease: "none",
     });
 
-    tl.to(containerRef.current, {
-      duration: duration,
-      y: finalY,
-      ease: "linear",
-      paused: false,
-    });
+    if (isRightToLeft) {
+      tl.fromTo(containerRef.current, {
+        x: startX
+      }, {
+        duration: duration,
+        x: 0,
+        ease: "linear",
+        paused: false,
+      });
+
+    } else {
+      tl.from(containerRef.current, {
+        duration: duration,
+        y: finalY,
+        ease: "linear",
+        paused: false,
+      });
+
+    }
+
 
     // tl.play();
   }, [containerRef, startDelay, endDelay, onComplete, speed, fadeInOutDuration]);
