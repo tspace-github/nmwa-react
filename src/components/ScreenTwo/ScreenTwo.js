@@ -87,7 +87,7 @@ const AutoScrollingComponent = ({
     });
 
     // tl.play();
-  }, [containerRef, startDelay, endDelay]);
+  }, [containerRef, startDelay, endDelay, onComplete, speed, fadeInOutDuration]);
 
   return (
     <div className="aniamtion-container" ref={containerRef}>

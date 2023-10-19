@@ -40,11 +40,11 @@ const ScreenOne = ({ data }) => {
       <div className="auto-scroll-wrapper">
         <div className="dont-overflow">
           <AutoScrollingComponent
-            startDelay={0}
-            endDelay={2000}
-            onComplete={onComplete}
-            speed={5}
             key={datasetkey + "-" + level}
+            startDelay={0}
+            endDelay={0}
+            onComplete={onComplete}
+            speed={2}
             fadeInOutDuration={1.5}
           >
             <div className="columns-container" id={datasetkey + "-" + level}>
@@ -103,7 +103,7 @@ const AutoScrollingComponent = ({
     });
 
     // tl.play();
-  }, [containerRef, startDelay, endDelay]);
+  }, [containerRef, startDelay, endDelay, onComplete, speed, fadeInOutDuration]);
 
   return (
     <div className="aniamtion-container" ref={containerRef}>
