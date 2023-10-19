@@ -23,6 +23,12 @@ const ScreenOne = ({ data }) => {
     }
   }, [level, levelLength, dataSetKeyIndex, allDataSetKeys.length]);
 
+  useEffect(() => {
+    console.log(data)
+  }, [])
+
+  // console.log('dataSetKeyIndex: ', dataSetKeyIndex, datasetkey, levelLength, 'level: ', level);
+
   return (
     <div className="app">
       <InfoColumn
@@ -107,26 +113,39 @@ const AutoScrollingComponent = ({
 };
 
 const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
+  // console.log('InfoColumn: ', allDataSetKeys, activeKeyIndex, data, level)
   const getDsetsAndLevels = () => {
-    return allDataSetKeys.map((dskey, index) => (
-      <div key={index} className={index === activeKeyIndex ? "active" : ""}>
-        <h2 className="set-title">
-          {data[allDataSetKeys[index]]["campaignInfo"][0]["title"]
-            ? data[allDataSetKeys[index]]["campaignInfo"][0]["title"]
-            : ""}
-        </h2>
-        <h3 className="level-title">
-          {data[allDataSetKeys[index]]["levels"][level]["title"]
-            ? data[allDataSetKeys[index]]["levels"][level]["title"]
-            : ""}
-        </h3>
-        <h4 className="level-desc">
-          {data[allDataSetKeys[index]]["levels"][level]["description"]
-            ? data[allDataSetKeys[index]]["levels"][level]["description"]
-            : ""}
-        </h4>
-      </div>
-    ));
+    return allDataSetKeys
+      .map((dskey, index) => {
+        const isActive = index === activeKeyIndex;
+        const subDataSet = data[allDataSetKeys[index]];
+        const campaignInfoData = subDataSet["campaignInfo"][0];
+        const levelData = subDataSet["levels"][level];
+        return (
+          <div key={index} className={isActive ? "active" : ""}>
+            <h2 className="set-title">
+              {campaignInfoData["title"]
+                ? campaignInfoData["title"]
+                : ""}
+            </h2>
+            {
+              isActive ? <>
+                <h3 className="level-title">
+                  {levelData["title"]
+                    ? levelData["title"]
+                    : ""}
+                </h3>
+                <h4 className="level-desc">
+                  {levelData["description"]
+                    ? levelData["description"]
+                    : ""}
+                </h4>
+              </>
+                : null
+            }
+          </div>
+        );
+      });
   };
 
   return (
