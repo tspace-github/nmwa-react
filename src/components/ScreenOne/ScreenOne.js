@@ -1,7 +1,7 @@
 import gsap from "gsap";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import "./ScreenOne.scss";
 import Logo from "../../assets/NMWA-logo.svg";
+import "./ScreenOne.scss";
 
 const ScreenOne = ({ data }) => {
   const [allDataSetKeys] = useState(["cumulative", "current-year-2023"]);
@@ -135,7 +135,7 @@ const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
 
       {getDsetsAndLevels()}
 
-      <div class="footer">
+      <div className="footer">
         <img src={Logo} alt="NMWA Logo" />
       </div>
     </div>
