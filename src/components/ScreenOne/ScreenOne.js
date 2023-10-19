@@ -23,9 +23,6 @@ const ScreenOne = ({ data }) => {
     }
   }, [level, levelLength, dataSetKeyIndex, allDataSetKeys.length]);
 
-  useEffect(() => {
-    console.log(data)
-  }, [])
 
   // console.log('dataSetKeyIndex: ', dataSetKeyIndex, datasetkey, levelLength, 'level: ', level);
 
