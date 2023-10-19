@@ -65,57 +65,63 @@ const AutoScrollingComponent = ({
   fadeInOutDuration = 0.5,
 }) => {
   const containerRef = useRef(null);
-
   useLayoutEffect(() => {
     const animationSpeed = speed;
     let columnHeight = containerRef.current.offsetHeight;
     columnHeight =
       columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
-    const duration = (columnHeight * animationSpeed) / 10000;
     const finalY =
       -columnHeight + window.innerHeight;
+    const bottomToTopDuration = (finalY * -1 * animationSpeed) / 10000;
     const isRightToLeft = finalY === 0;
     const startX = isRightToLeft ? 25 : 0;
-    console.log(finalY);
 
-    const tl = gsap.timeline({
-      delay: startDelay / 1000,
-      onComplete: () => {
-        if (typeof onComplete === "function") {
-          setTimeout(() => {
-            onComplete();
-          }, endDelay);
-        }
-      },
-    });
 
-    tl.to(containerRef.current, {
-      duration: fadeInOutDuration,
-      opacity: 1,
-      ease: "none",
-    });
-
-    if (isRightToLeft) {
-      tl.fromTo(containerRef.current, {
-        x: startX
-      }, {
-        duration: duration,
-        x: 0,
-        ease: "linear",
-        paused: false,
+    const context = gsap.context(() => {
+      const tl = gsap.timeline({
+        delay: startDelay / 1000,
+        onComplete: () => {
+          console.log("oncomplete")
+          if (typeof onComplete === "function") {
+            setTimeout(() => {
+              onComplete();
+            }, endDelay);
+          }
+        },
       });
 
-    } else {
-      tl.from(containerRef.current, {
-        duration: duration,
-        y: finalY,
-        ease: "linear",
-        paused: false,
+      tl.to(containerRef.current, {
+        duration: fadeInOutDuration,
+        opacity: 1,
+        ease: "none",
       });
 
+      if (isRightToLeft) {
+        tl.from(containerRef.current, {
+          x: startX,
+          duration: 1,
+          ease: "linear",
+          paused: false,
+        });
+
+      } else {
+        tl.to(containerRef.current, {
+          duration: bottomToTopDuration,
+          y: finalY,
+          ease: "linear",
+          paused: false,
+        });
+
+      }
+
+      tl.play();
+
+    })
+
+
+    return () => {
+      context.revert();
     }
-
-
     // tl.play();
   }, [containerRef, startDelay, endDelay, onComplete, speed, fadeInOutDuration]);
 
