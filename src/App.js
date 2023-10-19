@@ -1,8 +1,10 @@
 import React from "react";
-import ScreenOne from "./components/ScreenOne";
-import ScreenTwo from "./components/ScreenTwo";
+import ScreenOne from "./components/ScreenOne/ScreenOne.js";
+import ScreenTwo from "./components/ScreenTwo/ScreenTwo.js";
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
+
+import "./App.scss";
 
 const App = () => {
   const [data, setData] = useState(null);

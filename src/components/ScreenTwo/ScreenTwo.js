@@ -1,10 +1,9 @@
 import gsap from "gsap";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import "./ScreenOne/ScreenTwo.css";
-
+// import "./ScreenTwo.scss";
 
 const App = ({ data }) => {
-  const [allDataSetKeys] = useState(["cumulative", "current-year-2023",]);
+  const [allDataSetKeys] = useState(["cumulative", "current-year-2023"]);
   const [level, setLevel] = useState(0);
   const [dataSetKeyIndex, setDataSetKeyIndex] = useState(0);
   const datasetkey = allDataSetKeys[dataSetKeyIndex];
@@ -21,21 +20,22 @@ const App = ({ data }) => {
     } else {
       setLevel(level + 1);
     }
-  }, [level, levelLength, dataSetKeyIndex, allDataSetKeys.length])
+  }, [level, levelLength, dataSetKeyIndex, allDataSetKeys.length]);
 
   return (
     <div className="app">
+      <div className="column left-col">
+        {data[datasetkey]["campaignInfo"][0]["title"]}
+      </div>
       <AutoScrollingComponent
-        startDelay={3000}
-        endDelay={3000}
+        startDelay={0}
+        endDelay={2000}
         onComplete={onComplete}
-        speed={45}
+        speed={60}
         key={datasetkey + "-" + level}
+        fadeInOutDuration={1.5}
       >
-        <div
-          className="columns-container"
-          id={datasetkey + "-" + level}
-        >
+        <div className="columns-container" id={datasetkey + "-" + level}>
           {renderHtml(data, datasetkey, level)}
         </div>
       </AutoScrollingComponent>
@@ -43,26 +43,40 @@ const App = ({ data }) => {
   );
 };
 
-
-const AutoScrollingComponent = ({ children, startDelay = 0, endDelay = 0, onComplete, speed = 50 }) => {
+const AutoScrollingComponent = ({
+  children,
+  startDelay = 0,
+  endDelay = 0,
+  onComplete,
+  speed = 50,
+  fadeInOutDuration = 0.5,
+}) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
     const animationSpeed = speed;
     let columnHeight = containerRef.current.offsetHeight;
-    columnHeight = columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
+    columnHeight =
+      columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
     const duration = (columnHeight * animationSpeed) / 10000;
-    const finalY = -columnHeight - containerRef.current.offsetTop;
+    const finalY =
+      -columnHeight - containerRef.current.offsetTop + window.innerHeight;
 
     const tl = gsap.timeline({
       delay: startDelay / 1000,
       onComplete: () => {
-        if (typeof onComplete === 'function') {
+        if (typeof onComplete === "function") {
           setTimeout(() => {
             onComplete();
           }, endDelay);
         }
-      }
+      },
+    });
+
+    tl.to(containerRef.current, {
+      duration: fadeInOutDuration,
+      opacity: 1,
+      ease: "none",
     });
 
     tl.to(containerRef.current, {
@@ -73,17 +87,14 @@ const AutoScrollingComponent = ({ children, startDelay = 0, endDelay = 0, onComp
     });
 
     // tl.play();
-
   }, [containerRef, startDelay, endDelay]);
 
   return (
-    <div ref={containerRef}>
+    <div className="aniamtion-container" ref={containerRef}>
       {children}
     </div>
   );
-}
-
-
+};
 
 // const startAnimation = () => {
 //   const animationSpeed = 45; // Animation speed in seconds - higher value means slower
@@ -140,7 +151,6 @@ const renderHtml = (data, datasetkey, level) => {
   const htmlContent = renderDataColumns(levelNames);
   return htmlContent;
 };
-
 
 const renderDataColumns = (names) => {
   const nameColumns = splitNamesIntoColumns(names);
