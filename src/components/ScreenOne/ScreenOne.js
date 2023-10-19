@@ -31,19 +31,24 @@ const ScreenOne = ({ data }) => {
         data={data}
         level={level}
       />
-
-      <AutoScrollingComponent
-        startDelay={0}
-        endDelay={2000}
-        onComplete={onComplete}
-        speed={100}
-        key={datasetkey + "-" + level}
-        fadeInOutDuration={1.5}
-      >
-        <div className="columns-container" id={datasetkey + "-" + level}>
-          {renderHtml(data, datasetkey, level)}
+      <div className="auto-scroll-wrapper">
+        <div className="dont-overflow">
+          <AutoScrollingComponent
+            startDelay={0}
+            endDelay={2000}
+            onComplete={onComplete}
+            speed={5}
+            key={datasetkey + "-" + level}
+            fadeInOutDuration={1.5}
+          >
+            <div className="columns-container" id={datasetkey + "-" + level}>
+              {renderHtml(data, datasetkey, level)}
+            </div>
+          </AutoScrollingComponent>
         </div>
-      </AutoScrollingComponent>
+
+      </div>
+
     </div>
   );
 };
