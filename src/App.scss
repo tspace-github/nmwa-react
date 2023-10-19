@@ -177,6 +177,15 @@ p {
     text-align: left;
     flex: 1;
   }
+
+  // wrapper around the scroller
+  .auto-scroll-wrapper {
+    max-height: calc(100vh - 2*$columnPadding);
+  }
+
+  .dont-overflow {
+    overflow: hidden;
+  }
 }
 
 
