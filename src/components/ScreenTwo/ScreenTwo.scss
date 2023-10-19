@@ -1,0 +1,117 @@
+/* styles.css */
+
+.app {
+  display: flex;
+  font-family: Arial, sans-serif;
+}
+
+.columns-container {
+  display: flex;
+}
+
+.aniamtion-container {
+  opacity: 0;
+}
+
+.name {
+  margin: 0 0 15px 5px;
+  color: #333;
+}
+
+#div-2022 {
+  background: yellow;
+}
+
+#div-2023 {
+  background: pink;
+}
+
+// styling from Leon
+
+.outer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  opacity: 0;
+  gap: 20px;
+  background-color: #ffffff;
+
+  &:nth-last-of-type(1) {
+    opacity: 1;
+  }
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  opacity: 0;
+  gap: 20px;
+
+  &:nth-last-of-type(1) {
+    opacity: 1;
+  }
+}
+
+.column {
+  padding: 30px;
+  margin: 0;
+  overflow: hidden;
+  position: relative;
+  text-align: left;
+  flex: 1;
+}
+
+.name {
+  margin-bottom: 35px;
+}
+
+h1 {}
+
+h2 {}
+
+h3 {
+  color: #d2d2d2;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  width: 30%;
+  text-align: right;
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+}
+
+.active-campaign,
+.inactive-campaign {
+  h2 {
+    margin-top: 2.5em;
+    margin-bottom: 0.5em;
+  }
+}
+
+.active-campaign h2 {
+  color: #00a884;
+}
+
+.active-campaign h3 {
+  color: #4f5455;
+  font-family: "Flama-Regular";
+  margin-top: 0;
+}
+
+.inactive-campaign h2 {
+  color: #d2d2d2;
+  margin-top: 2em;
+}
