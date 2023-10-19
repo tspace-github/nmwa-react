@@ -154,7 +154,6 @@ p {
 
   .aniamtion-container {
     opacity: 0;
-    width: 75%;
 
     .columns-container {
       display: flex;
@@ -176,6 +175,16 @@ p {
     position: relative;
     text-align: left;
     flex: 1;
+  }
+
+  // wrapper around the scroller
+  .auto-scroll-wrapper {
+    max-height: calc(100vh - 2*$columnPadding);
+    width: 75%;
+  }
+
+  .dont-overflow {
+    overflow: hidden;
   }
 }
 

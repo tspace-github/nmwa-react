@@ -1,7 +1,7 @@
 import gsap from "gsap";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import "./ScreenOne.scss";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import Logo from "../../assets/NMWA-logo.svg";
+import "./ScreenOne.scss";
 
 const ScreenOne = ({ data }) => {
   const [allDataSetKeys] = useState(["cumulative", "current-year-2023"]);
@@ -23,6 +23,9 @@ const ScreenOne = ({ data }) => {
     }
   }, [level, levelLength, dataSetKeyIndex, allDataSetKeys.length]);
 
+
+  // console.log('dataSetKeyIndex: ', dataSetKeyIndex, datasetkey, levelLength, 'level: ', level);
+
   return (
     <div className="app">
       <InfoColumn
@@ -31,19 +34,24 @@ const ScreenOne = ({ data }) => {
         data={data}
         level={level}
       />
-
-      <AutoScrollingComponent
-        startDelay={0}
-        endDelay={2000}
-        onComplete={onComplete}
-        speed={100}
-        key={datasetkey + "-" + level}
-        fadeInOutDuration={1.5}
-      >
-        <div className="columns-container" id={datasetkey + "-" + level}>
-          {renderHtml(data, datasetkey, level)}
+      <div className="auto-scroll-wrapper">
+        <div className="dont-overflow">
+          <AutoScrollingComponent
+            key={datasetkey + "-" + level}
+            startDelay={0}
+            endDelay={2000}
+            onComplete={onComplete}
+            speed={40}
+            fadeInOutDuration={1.5}
+          >
+            <div className="columns-container" id={datasetkey + "-" + level}>
+              {renderHtml(data, datasetkey, level)}
+            </div>
+          </AutoScrollingComponent>
         </div>
-      </AutoScrollingComponent>
+
+      </div>
+
     </div>
   );
 };
@@ -57,42 +65,65 @@ const AutoScrollingComponent = ({
   fadeInOutDuration = 0.5,
 }) => {
   const containerRef = useRef(null);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     const animationSpeed = speed;
     let columnHeight = containerRef.current.offsetHeight;
     columnHeight =
       columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
-    const duration = (columnHeight * animationSpeed) / 10000;
     const finalY =
-      -columnHeight - containerRef.current.offsetTop + window.innerHeight;
+      -columnHeight + window.innerHeight;
+    const bottomToTopDuration = (finalY * -1 * animationSpeed) / 10000;
+    const isRightToLeft = finalY === 0;
+    const startX = isRightToLeft ? 25 : 0;
 
-    const tl = gsap.timeline({
-      delay: startDelay / 1000,
-      onComplete: () => {
-        if (typeof onComplete === "function") {
-          setTimeout(() => {
-            onComplete();
-          }, endDelay);
-        }
-      },
-    });
 
-    tl.to(containerRef.current, {
-      duration: fadeInOutDuration,
-      opacity: 1,
-      ease: "none",
-    });
+    const context = gsap.context(() => {
+      const tl = gsap.timeline({
+        delay: startDelay / 1000,
+        onComplete: () => {
+          console.log("oncomplete")
+          if (typeof onComplete === "function") {
+            setTimeout(() => {
+              onComplete();
+            }, endDelay);
+          }
+        },
+      });
 
-    tl.to(containerRef.current, {
-      duration: duration,
-      y: finalY,
-      ease: "linear",
-      paused: false,
-    });
+      tl.to(containerRef.current, {
+        duration: fadeInOutDuration,
+        opacity: 1,
+        ease: "none",
+      });
 
+      if (isRightToLeft) {
+        tl.from(containerRef.current, {
+          x: startX,
+          duration: 1,
+          ease: "linear",
+          paused: false,
+        });
+
+      } else {
+        tl.to(containerRef.current, {
+          duration: bottomToTopDuration,
+          y: finalY,
+          ease: "linear",
+          paused: false,
+        });
+
+      }
+
+      tl.play();
+
+    })
+
+
+    return () => {
+      context.revert();
+    }
     // tl.play();
-  }, [containerRef, startDelay, endDelay]);
+  }, [containerRef, startDelay, endDelay, onComplete, speed, fadeInOutDuration]);
 
   return (
     <div className="aniamtion-container" ref={containerRef}>
@@ -102,26 +133,39 @@ const AutoScrollingComponent = ({
 };
 
 const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
+  // console.log('InfoColumn: ', allDataSetKeys, activeKeyIndex, data, level)
   const getDsetsAndLevels = () => {
-    return allDataSetKeys.map((dskey, index) => (
-      <div key={index} className={index === activeKeyIndex ? "active" : ""}>
-        <h2 className="set-title">
-          {data[allDataSetKeys[index]]["campaignInfo"][0]["title"]
-            ? data[allDataSetKeys[index]]["campaignInfo"][0]["title"]
-            : ""}
-        </h2>
-        <h3 className="level-title">
-          {data[allDataSetKeys[index]]["levels"][level]["title"]
-            ? data[allDataSetKeys[index]]["levels"][level]["title"]
-            : ""}
-        </h3>
-        <h4 className="level-desc">
-          {data[allDataSetKeys[index]]["levels"][level]["description"]
-            ? data[allDataSetKeys[index]]["levels"][level]["description"]
-            : ""}
-        </h4>
-      </div>
-    ));
+    return allDataSetKeys
+      .map((dskey, index) => {
+        const isActive = index === activeKeyIndex;
+        const subDataSet = data[allDataSetKeys[index]];
+        const campaignInfoData = subDataSet["campaignInfo"][0];
+        const levelData = subDataSet["levels"][level];
+        return (
+          <div key={index} className={isActive ? "active" : ""}>
+            <h2 className="set-title">
+              {campaignInfoData["title"]
+                ? campaignInfoData["title"]
+                : ""}
+            </h2>
+            {
+              isActive ? <>
+                <h3 className="level-title">
+                  {levelData["title"]
+                    ? levelData["title"]
+                    : ""}
+                </h3>
+                <h4 className="level-desc">
+                  {levelData["description"]
+                    ? levelData["description"]
+                    : ""}
+                </h4>
+              </>
+                : null
+            }
+          </div>
+        );
+      });
   };
 
   return (
@@ -135,7 +179,7 @@ const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
 
       {getDsetsAndLevels()}
 
-      <div class="footer">
+      <div className="footer">
         <img src={Logo} alt="NMWA Logo" />
       </div>
     </div>
