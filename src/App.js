@@ -4,6 +4,7 @@ import ScreenTwo from "./components/ScreenTwo/ScreenTwo.js";
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import testData from "./data/testData.js";
 import "./App.scss";
 
 const App = () => {
@@ -14,10 +15,14 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "https://leon.tappingbones.works/wp-json/tapping/v1/members"
-        );
-        const jsonData = await response.json();
+        // const response = await fetch(
+        //   "https://leon.tappingbones.works/wp-json/tapping/v1/members"
+        // );
+        // const response = await fetch(
+        //   "http://nmwa-api:8888/wp-json/tapping/v1/members"
+        // );
+        const jsonData = testData[0];
+        // const jsonData = await response.json();
         setData(jsonData);
         setLoading(false);
       } catch (error) {

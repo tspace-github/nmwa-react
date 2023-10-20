@@ -1,14 +1,33 @@
 import gsap from "gsap";
-import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useLayoutEffect,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import he from "he";
+
 import Logo from "../../assets/NMWA-logo.svg";
 import "./ScreenOne.scss";
 
 const ScreenOne = ({ data }) => {
-  const [allDataSetKeys] = useState(["cumulative", "current-year-2023"]);
+  console.log(data);
+  const [allDataSetKeys] = useState(["cumulative", "2023-donors"]);
   const [level, setLevel] = useState(0);
   const [dataSetKeyIndex, setDataSetKeyIndex] = useState(0);
   const datasetkey = allDataSetKeys[dataSetKeyIndex];
   const levelLength = data[datasetkey]["levels"].length;
+
+  useLayoutEffect(() => {
+    // Add a class to the body element when the component mounts
+    document.body.classList.add("scr-mezanine");
+
+    // Remove the class when the component unmounts (optional)
+    return () => {
+      document.body.classList.remove("scr-mezanine");
+    };
+  }, []);
 
   const onComplete = useCallback(() => {
     if (level === levelLength - 1) {
@@ -58,11 +77,11 @@ const AutoScrollingComponent = ({
   startDelay = 0,
   endDelay = 0,
   onComplete,
-  speed = 70,
+  speed = 1,
   fadeInOutDuration = 0.5,
 }) => {
   const containerRef = useRef(null);
-  useLayoutEffect(() => {
+  useEffect(() => {
     const animationSpeed = speed;
     let columnHeight = containerRef.current.offsetHeight;
     columnHeight =
@@ -92,13 +111,26 @@ const AutoScrollingComponent = ({
       });
 
       if (isRightToLeft) {
-        tl.from(containerRef.current, {
-          x: startX,
-          duration: 1,
-          ease: "linear",
-          paused: false,
-        });
+        tl.fromTo(
+          containerRef.current,
+          {
+            y: "2rem",
+            x: startX,
+            duration: 1,
+            ease: "linear",
+            paused: false,
+            opacity: 0,
+          },
+          {
+            y: "2rem",
+            x: 0,
+            opacity: 1,
+          }
+        );
       } else {
+        tl.from(containerRef.current, {
+          y: "2rem",
+        });
         tl.to(containerRef.current, {
           duration: bottomToTopDuration,
           y: finalY,
@@ -132,6 +164,18 @@ const AutoScrollingComponent = ({
 
 const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
   // console.log('InfoColumn: ', allDataSetKeys, activeKeyIndex, data, level)
+
+  const getCampaignDescription = () => {
+    const currentCampaignDesc = he.decode(
+      data[allDataSetKeys[activeKeyIndex]]["campaignInfo"][0]["description"]
+    );
+    const descParts = currentCampaignDesc.split("|");
+
+    const desc = descParts.join("<br />");
+
+    return desc;
+  };
+
   const getDsetsAndLevels = () => {
     return allDataSetKeys.map((dskey, index) => {
       const isActive = index === activeKeyIndex;
@@ -148,9 +192,9 @@ const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
               <h3 className="level-title">
                 {levelData["title"] ? levelData["title"] : ""}
               </h3>
-              <h4 className="level-desc">
+              {/*<h4 className="level-desc">
                 {levelData["description"] ? levelData["description"] : ""}
-              </h4>
+          </h4>*/}
             </>
           ) : null}
         </div>
@@ -160,18 +204,21 @@ const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
 
   return (
     <div className="column left-col">
-      <h1>With Thanks</h1>
-      <p>
-        NMWA is deeply grateful to supporters of the Legacy of Women in the Arts
-        Endowment Campaign, individual donors and organizations, and members of
-        the Legacy Society.
-      </p>
+      <h1 className="main-title">With Thanks</h1>
+      <p
+        className="main-desc"
+        dangerouslySetInnerHTML={{
+          __html: getCampaignDescription(),
+        }}
+      ></p>
 
       {getDsetsAndLevels()}
 
-      <div className="footer">
-        <img src={Logo} alt="NMWA Logo" />
-      </div>
+      {/*
+        <div className="footer">
+          <img src={Logo} alt="NMWA Logo" />
+        </div>
+      */}
     </div>
   );
 };
