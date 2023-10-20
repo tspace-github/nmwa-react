@@ -7,15 +7,15 @@ $columnPadding: 2rem;
 }
 
 @font-face {
-  font-family: "Flama-Regular";
-  src: url("./assets/fonts/Flama-Regular.woff") format("woff");
+  font-family: "Flama-Basic";
+  src: url("./assets/fonts/Flama-Basic.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "Flama-Bold";
-  src: url("./assets/fonts/Flama-Bold.woff") format("woff");
+  font-family: "Flama-Semibold";
+  src: url("./assets/fonts/Flama-Semibold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
 }
@@ -28,7 +28,7 @@ body {
   font-size: $base_font_size;
   line-height: 1.133;
   font-weight: normal;
-  font-family: "Flama-Regular", Helvetica, Arial, sans-serif;
+  font-family: "Flama-Basic", Helvetica, Arial, sans-serif;
   color: #4f5455;
   text-align: center;
   background: #333;
@@ -40,7 +40,7 @@ body {
   h2,
   h3 {
     font-weight: bold;
-    font-family: "Flama-Bold", Helvetica, Arial, sans-serif;
+    font-family: "Flama-Semibold", Helvetica, Arial, sans-serif;
     color: #4f5455;
     margin: 0 0 30px 0;
     padding: 0;
@@ -124,7 +124,7 @@ body {
       padding: 2rem;
     }
 
-    .aniamtion-container {
+    .animation-container {
       opacity: 0;
 
       .columns-container {
@@ -135,8 +135,15 @@ body {
       .name {
         margin: 0 0 35px 5px;
         color: #333;
-        font-size: 1.75rem;
-        ;
+        $large: 1;
+
+        @if $large {
+          font-size: 1.5rem;
+        }
+
+        @else {
+          font-size: 1rem;
+        }
       }
 
       .column {
