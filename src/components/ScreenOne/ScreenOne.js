@@ -21,11 +21,11 @@ const ScreenOne = ({ data }) => {
 
   useLayoutEffect(() => {
     // Add a class to the body element when the component mounts
-    document.body.classList.add("scr-mezanine");
+    document.body.classList.add("scr-mezzanine");
 
     // Remove the class when the component unmounts (optional)
     return () => {
-      document.body.classList.remove("scr-mezanine");
+      document.body.classList.remove("scr-mezzanine");
     };
   }, []);
 
@@ -156,7 +156,7 @@ const AutoScrollingComponent = ({
   ]);
 
   return (
-    <div className="aniamtion-container" ref={containerRef}>
+    <div className="animation-container" ref={containerRef}>
       {children}
     </div>
   );
