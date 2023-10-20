@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import he from "he";
 
-import Logo from "../../assets/NMWA-logo.svg";
+// import Logo from "../../assets/NMWA-logo.svg";
 import "./ScreenOne.scss";
 
 const ScreenOne = ({ data }) => {
@@ -16,6 +16,7 @@ const ScreenOne = ({ data }) => {
   const [allDataSetKeys] = useState(["cumulative", "2023-donors"]);
   const [level, setLevel] = useState(0);
   const [dataSetKeyIndex, setDataSetKeyIndex] = useState(0);
+  const [rootFontSize, setRootFontSize] = useState(100);
   const datasetkey = allDataSetKeys[dataSetKeyIndex];
   const levelLength = data[datasetkey]["levels"].length;
 
@@ -59,11 +60,12 @@ const ScreenOne = ({ data }) => {
             startDelay={0}
             endDelay={2000}
             onComplete={onComplete}
-            speed={150}
+            speed={35}
             fadeInOutDuration={1.5}
+            rootFontSize={rootFontSize}
           >
             <div className="columns-container" id={datasetkey + "-" + level}>
-              {renderHtml(data, datasetkey, level)}
+              {renderHtml(data, datasetkey, level, rootFontSize)}
             </div>
           </AutoScrollingComponent>
         </div>
@@ -77,8 +79,9 @@ const AutoScrollingComponent = ({
   startDelay = 0,
   endDelay = 0,
   onComplete,
-  speed = 1,
+  speed = 70,
   fadeInOutDuration = 0.5,
+  rootFontSize,
 }) => {
   const containerRef = useRef(null);
   useEffect(() => {
@@ -95,7 +98,7 @@ const AutoScrollingComponent = ({
       const tl = gsap.timeline({
         delay: startDelay / 1000,
         onComplete: () => {
-          console.log("oncomplete");
+          // console.log("oncomplete");
           if (typeof onComplete === "function") {
             setTimeout(() => {
               onComplete();
@@ -104,21 +107,14 @@ const AutoScrollingComponent = ({
         },
       });
 
-      tl.to(containerRef.current, {
-        duration: fadeInOutDuration,
-        opacity: 1,
-        ease: "none",
-      });
-
       if (isRightToLeft) {
         tl.fromTo(
           containerRef.current,
           {
             y: "2rem",
             x: startX,
-            duration: 1,
+            duration: fadeInOutDuration,
             ease: "linear",
-            paused: false,
             opacity: 0,
           },
           {
@@ -128,6 +124,11 @@ const AutoScrollingComponent = ({
           }
         );
       } else {
+        tl.to(containerRef.current, {
+          duration: fadeInOutDuration,
+          opacity: 1,
+          ease: "none",
+        });
         tl.from(containerRef.current, {
           y: "2rem",
         });
@@ -160,6 +161,80 @@ const AutoScrollingComponent = ({
       {children}
     </div>
   );
+};
+
+const renderHtml = (data, datasetkey, level, rootFontSize) => {
+  // console.log('renderHtml:');
+  const levelNames = data[datasetkey]["levels"][level]["names"];
+  const nameFontSize = data[datasetkey]["levels"][level]["fontSize"];
+  const nameLineHeight = data[datasetkey]["levels"][level]["leading"];
+  const nameMargin = data[datasetkey]["levels"][level]["paragraphSpacing"];
+  // console.log(
+  //   "count of names: ",
+  //   Object.keys(data[datasetkey]["levels"][level]["names"]).length
+  // );
+  const htmlContent = renderDataColumns(
+    levelNames,
+    nameFontSize,
+    nameLineHeight,
+    nameMargin,
+    rootFontSize
+  );
+  return htmlContent;
+};
+
+const renderDataColumns = (
+  names,
+  nameFontSize,
+  nameLineHeight,
+  nameMargin,
+  rootFontSize
+) => {
+  const nameColumns = splitNamesIntoColumns(names);
+
+  const nameStyle = {
+    fontSize: `${nameFontSize / rootFontSize}rem`,
+    lineHeight: nameLineHeight / nameFontSize,
+    marginBottom: `${nameMargin / rootFontSize}rem`,
+  };
+
+  return nameColumns.map((column, index) => (
+    <div key={index} className="column">
+      {column.map((name, nameIndex) => (
+        <div
+          key={nameIndex}
+          className="name"
+          style={nameStyle}
+          dangerouslySetInnerHTML={{ __html: name }}
+        ></div>
+      ))}
+    </div>
+  ));
+};
+
+const splitNamesIntoColumns = (data) => {
+  // console.log('splitNamesIntoColumns:');
+  const splitIntoColumns = (namesObject) => {
+    const namesArray = namesObject.map((name) =>
+      Array.isArray(name) ? name.join("<br />") : name
+    );
+    const totalNames = namesArray.length;
+    const namesPerColumn = Math.ceil(totalNames / 3);
+    const columns = [];
+    for (let i = 0; i < totalNames; i += namesPerColumn) {
+      const column = namesArray.slice(i, i + namesPerColumn);
+      columns.push(column);
+    }
+
+    return columns;
+  };
+  const sortedNamesObjectKeys = Object.keys(data).sort();
+  const sortedNamesArray = [];
+  sortedNamesObjectKeys.forEach((key) => {
+    sortedNamesArray.push(data[key]);
+  });
+  const allColumns = splitIntoColumns(sortedNamesArray);
+  return allColumns;
 };
 
 const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
@@ -221,58 +296,6 @@ const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
       */}
     </div>
   );
-};
-
-const renderHtml = (data, datasetkey, level) => {
-  // console.log('renderHtml:');
-  const levelNames = data[datasetkey]["levels"][level]["names"];
-  // console.log(
-  //   "count of names: ",
-  //   Object.keys(data[datasetkey]["levels"][level]["names"]).length
-  // );
-  const htmlContent = renderDataColumns(levelNames);
-  return htmlContent;
-};
-
-const renderDataColumns = (names) => {
-  const nameColumns = splitNamesIntoColumns(names);
-
-  return nameColumns.map((column, index) => (
-    <div key={index} className="column">
-      {column.map((name, nameIndex) => (
-        <div
-          key={nameIndex}
-          className="name"
-          dangerouslySetInnerHTML={{ __html: name }}
-        ></div>
-      ))}
-    </div>
-  ));
-};
-
-const splitNamesIntoColumns = (data) => {
-  // console.log('splitNamesIntoColumns:');
-  const splitIntoColumns = (namesObject) => {
-    const namesArray = namesObject.map((name) =>
-      Array.isArray(name) ? name.join("<br />") : name
-    );
-    const totalNames = namesArray.length;
-    const namesPerColumn = Math.ceil(totalNames / 3);
-    const columns = [];
-    for (let i = 0; i < totalNames; i += namesPerColumn) {
-      const column = namesArray.slice(i, i + namesPerColumn);
-      columns.push(column);
-    }
-
-    return columns;
-  };
-  const sortedNamesObjectKeys = Object.keys(data).sort();
-  const sortedNamesArray = [];
-  sortedNamesObjectKeys.forEach((key) => {
-    sortedNamesArray.push(data[key]);
-  });
-  const allColumns = splitIntoColumns(sortedNamesArray);
-  return allColumns;
 };
 
 export default ScreenOne;
