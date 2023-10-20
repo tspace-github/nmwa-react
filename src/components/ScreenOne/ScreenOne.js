@@ -156,7 +156,7 @@ const AutoScrollingComponent = ({
   ]);
 
   return (
-    <div className="aniamtion-container" ref={containerRef}>
+    <div className="animation-container" ref={containerRef}>
       {children}
     </div>
   );
