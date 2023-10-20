@@ -127,12 +127,7 @@ body {
       .name {
         margin: 0 0 35px 5px;
         color: #333;
-        $large: 1;
-        @if $large {
-          font-size: 1.5rem;
-        } @else {
           font-size: 1rem;
-        }
       }
     }
 
