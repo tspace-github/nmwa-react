@@ -1,6 +1,7 @@
 import React from "react";
 import ScreenOne from "./components/ScreenOne/ScreenOne.js";
 import ScreenTwo from "./components/ScreenTwo/ScreenTwo.js";
+import ScreenThree from "./components/ScreenThree/ScreenThree.js";
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -47,6 +48,7 @@ const App = () => {
       <Routes>
         <Route path="/screen-one" element={<ScreenOne data={data} />} />
         <Route path="/screen-two" element={<ScreenTwo data={data} />} />
+        <Route path="/screen-three" element={<ScreenThree data={data} />} />
       </Routes>
     </div>
   );
