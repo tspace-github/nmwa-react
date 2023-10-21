@@ -2099,7 +2099,7 @@ const dataArray = [
     cumulative: {
       campaignInfo: [
         {
-          title: "Cumulative Giving Society",
+          title: "NMWA Cumulative Giving Society",
           description:
             "The National Museum of Women in the Arts|is deeply grateful to the following generous donors with total contributions to the museum of $100,000 or more.|&lt;i&gt;List as of August 7, 2023&lt;/i&gt;",
           scrollSpeed: null,

@@ -77,10 +77,10 @@ const ScreenOne = ({ data }) => {
 const AutoScrollingComponent = ({
   children,
   startDelay = 0,
-  endDelay = 0,
+  endDelay = 2000,
   onComplete,
-  speed = 70,
-  fadeInOutDuration = 0.5,
+  speed = 35,
+  fadeInOutDuration = 1.5,
   rootFontSize,
 }) => {
   const containerRef = useRef(null);
@@ -224,6 +224,11 @@ const splitNamesIntoColumns = (data) => {
     for (let i = 0; i < totalNames; i += namesPerColumn) {
       const column = namesArray.slice(i, i + namesPerColumn);
       columns.push(column);
+    }
+
+    while (columns.length < 3) {
+      const col = [];
+      columns.push(col);
     }
 
     return columns;

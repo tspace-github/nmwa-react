@@ -1,0 +1,161 @@
+$base_font_size: 100px; // 100px default for 8640 X 3840
+$columnPadding: 2rem;
+
+html,
+body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-size: $base_font_size;
+    line-height: 1.133;
+    font-weight: normal;
+    font-family: "Flama-Basic", Helvetica, Arial, sans-serif;
+    color: #4f5455;
+    text-align: center;
+    background: #333;
+}
+
+.scr-mezzanine {
+
+    h1,
+    h2,
+    h3 {
+        font-weight: bold;
+        font-family: "Flama-Semibold", Helvetica, Arial, sans-serif;
+        color: #4f5455;
+        margin: 0 0 30px 0;
+        padding: 0;
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        color: #d2d2d2;
+    }
+
+    p {
+        padding: 0;
+        margin: 0 0 50px 0;
+    }
+
+    .app {
+        overflow: hidden;
+        display: flex;
+        z-index: 1;
+        width: 8640px;
+        height: 3840px;
+        background: #fff;
+
+        .left-col {
+            width: 25%;
+            height: 100vh;
+            padding: $columnPadding;
+
+            h2 {
+                margin-top: 3.75rem;
+                margin-bottom: 0.5rem;
+                color: #d2d2d2;
+            }
+
+            .main-title {
+                margin-bottom: 1rem;
+            }
+
+            .main-desc {
+                color: #4e5555;
+                margin-bottom: 4.5rem;
+                line-height: 1.333;
+                font-size: 0.75rem;
+            }
+
+            .level-title,
+            .level-desc {
+                display: none;
+            }
+
+            .level-desc {
+                margin-bottom: 4rem;
+            }
+
+            .active {
+
+                h2.set-title {
+                    margin-bottom: 0.5rem;
+                    color: #00a884;
+                }
+
+                .level-title,
+                .level-desc {
+                    display: block;
+                }
+
+                h3 {
+                    color: #4f5455;
+                    font-family: "Flama-Basic";
+                    margin-top: 0;
+                }
+            }
+        }
+
+        .column {
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+            text-align: left;
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .animation-container {
+            opacity: 0;
+
+            .columns-container {
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .name {
+                margin: 0 0 35px 5px;
+                color: #333;
+                $large: 1;
+
+                @if $large {
+                    font-size: 1.5rem;
+                }
+
+                @else {
+                    font-size: 1rem;
+                }
+            }
+
+            .column {
+                padding-top: 0;
+            }
+        }
+
+
+
+        // wrapper around the scroller
+        .auto-scroll-wrapper {
+            width: 75%;
+        }
+
+        .dont-overflow {
+            overflow: hidden;
+            height: 100vh
+        }
+    }
+
+
+    // styling from Leon
+
+    .footer {
+        display: flex;
+        flex-direction: column;
+        margin-left: auto;
+        width: 30%;
+        text-align: right;
+        position: absolute;
+        bottom: 0;
+        right: 30px;
+    }
+}

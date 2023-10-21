@@ -1,13 +1,33 @@
 import gsap from "gsap";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-// import "./ScreenTwo.scss";
+import React, {
+  useCallback,
+  useLayoutEffect,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import he from "he";
 
-const App = ({ data }) => {
-  const [allDataSetKeys] = useState(["cumulative", "current-year-2023"]);
+import "./ScreenTwo.scss";
+
+const ScreenTwo = ({ data }) => {
+  console.log(data);
+  const [allDataSetKeys] = useState(["space-to-soar"]);
   const [level, setLevel] = useState(0);
   const [dataSetKeyIndex, setDataSetKeyIndex] = useState(0);
+  const [rootFontSize, setRootFontSize] = useState(100);
   const datasetkey = allDataSetKeys[dataSetKeyIndex];
   const levelLength = data[datasetkey]["levels"].length;
+
+  useLayoutEffect(() => {
+    // Add a class to the body element when the component mounts
+    document.body.classList.add("scr-two");
+
+    // Remove the class when the component unmounts (optional)
+    return () => {
+      document.body.classList.remove("scr-two");
+    };
+  }, []);
 
   const onComplete = useCallback(() => {
     if (level === levelLength - 1) {
@@ -22,23 +42,33 @@ const App = ({ data }) => {
     }
   }, [level, levelLength, dataSetKeyIndex, allDataSetKeys.length]);
 
+  // console.log('dataSetKeyIndex: ', dataSetKeyIndex, datasetkey, levelLength, 'level: ', level);
+
   return (
     <div className="app">
-      <div className="column left-col">
-        {data[datasetkey]["campaignInfo"][0]["title"]}
-      </div>
-      <AutoScrollingComponent
-        startDelay={0}
-        endDelay={2000}
-        onComplete={onComplete}
-        speed={60}
-        key={datasetkey + "-" + level}
-        fadeInOutDuration={1.5}
-      >
-        <div className="columns-container" id={datasetkey + "-" + level}>
-          {renderHtml(data, datasetkey, level)}
+      <InfoColumn
+        allDataSetKeys={allDataSetKeys}
+        activeKeyIndex={dataSetKeyIndex}
+        data={data}
+        level={level}
+      />
+      <div className="auto-scroll-wrapper">
+        <div className="dont-overflow">
+          <AutoScrollingComponent
+            key={datasetkey + "-" + level}
+            startDelay={0}
+            endDelay={2000}
+            onComplete={onComplete}
+            speed={35}
+            fadeInOutDuration={1.5}
+            rootFontSize={rootFontSize}
+          >
+            <div className="columns-container" id={datasetkey + "-" + level}>
+              {renderHtml(data, datasetkey, level, rootFontSize)}
+            </div>
+          </AutoScrollingComponent>
         </div>
-      </AutoScrollingComponent>
+      </div>
     </div>
   );
 };
@@ -46,114 +76,126 @@ const App = ({ data }) => {
 const AutoScrollingComponent = ({
   children,
   startDelay = 0,
-  endDelay = 0,
+  endDelay = 2000,
   onComplete,
-  speed = 50,
-  fadeInOutDuration = 0.5,
+  speed = 35,
+  fadeInOutDuration = 1.5,
+  rootFontSize,
 }) => {
   const containerRef = useRef(null);
-
   useEffect(() => {
     const animationSpeed = speed;
     let columnHeight = containerRef.current.offsetHeight;
     columnHeight =
       columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
-    const duration = (columnHeight * animationSpeed) / 10000;
-    const finalY =
-      -columnHeight - containerRef.current.offsetTop + window.innerHeight;
+    const finalY = -columnHeight + window.innerHeight;
+    const bottomToTopDuration = (finalY * -1 * animationSpeed) / 10000;
+    const isRightToLeft = finalY === 0;
+    const startX = isRightToLeft ? 25 : 0;
 
-    const tl = gsap.timeline({
-      delay: startDelay / 1000,
-      onComplete: () => {
-        if (typeof onComplete === "function") {
-          setTimeout(() => {
-            onComplete();
-          }, endDelay);
-        }
-      },
+    const context = gsap.context(() => {
+      const tl = gsap.timeline({
+        delay: startDelay / 1000,
+        onComplete: () => {
+          // console.log("oncomplete");
+          if (typeof onComplete === "function") {
+            setTimeout(() => {
+              onComplete();
+            }, endDelay);
+          }
+        },
+      });
+
+      if (isRightToLeft) {
+        tl.fromTo(
+          containerRef.current,
+          {
+            y: "2rem",
+            x: startX,
+            duration: fadeInOutDuration,
+            ease: "linear",
+            opacity: 0,
+          },
+          {
+            y: "2rem",
+            x: 0,
+            opacity: 1,
+          }
+        );
+      } else {
+        tl.to(containerRef.current, {
+          duration: fadeInOutDuration,
+          opacity: 1,
+          ease: "none",
+        });
+        tl.from(containerRef.current, {
+          y: "2rem",
+        });
+        tl.to(containerRef.current, {
+          duration: bottomToTopDuration,
+          y: finalY,
+          ease: "linear",
+          paused: false,
+        });
+      }
+
+      tl.play();
     });
 
-    tl.to(containerRef.current, {
-      duration: fadeInOutDuration,
-      opacity: 1,
-      ease: "none",
-    });
-
-    tl.to(containerRef.current, {
-      duration: duration,
-      y: finalY,
-      ease: "linear",
-      paused: false,
-    });
-
+    return () => {
+      context.revert();
+    };
     // tl.play();
-  }, [containerRef, startDelay, endDelay, onComplete, speed, fadeInOutDuration]);
+  }, [
+    containerRef,
+    startDelay,
+    endDelay,
+    onComplete,
+    speed,
+    fadeInOutDuration,
+  ]);
 
   return (
-    <div className="aniamtion-container" ref={containerRef}>
+    <div className="animation-container" ref={containerRef}>
       {children}
     </div>
   );
 };
 
-// const startAnimation = () => {
-//   const animationSpeed = 45; // Animation speed in seconds - higher value means slower
-//   const pauseAfterCompletion = 3000;
-//   const fadeInOutDuration = 3;
-
-//   let columnHeight = containerRef.current.offsetHeight;
-
-//   columnHeight =
-//     columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
-
-//   const tl = gsap.timeline({ repeat: -1 });
-
-//   tl.to(containerRef.current, {
-//     duration: fadeInOutDuration,
-//     opacity: 1,
-//     ease: "linear",
-//   });
-
-//   tl.fromTo(
-//     containerRef.current,
-//     {
-//       y: -containerRef.current.offsetTop,
-//       x: 0,
-//     },
-//     {
-//       x: 0,
-//       y: -columnHeight - containerRef.current.offsetTop + window.innerHeight,
-//       ease: "linear",
-//       duration: (animationSpeed * columnHeight) / 10000, // 10000 is just a scaling factor
-//       onComplete: () => {
-//         tl.pause();
-//         setTimeout(() => {
-//           tl.restart();
-//         }, pauseAfterCompletion);
-//       },
-//     }
-//   );
-
-//   tl.set(containerRef.current, { y: 0 });
-
-//   return () => {
-//     tl.kill(); // Kill the animation on component unmount
-//   };
-// };
-
-const renderHtml = (data, datasetkey, level) => {
+const renderHtml = (data, datasetkey, level, rootFontSize) => {
   // console.log('renderHtml:');
   const levelNames = data[datasetkey]["levels"][level]["names"];
+  const nameFontSize = data[datasetkey]["levels"][level]["fontSize"];
+  const nameLineHeight = data[datasetkey]["levels"][level]["leading"];
+  const nameMargin = data[datasetkey]["levels"][level]["paragraphSpacing"];
   // console.log(
   //   "count of names: ",
   //   Object.keys(data[datasetkey]["levels"][level]["names"]).length
   // );
-  const htmlContent = renderDataColumns(levelNames);
+  const htmlContent = renderDataColumns(
+    levelNames,
+    nameFontSize,
+    nameLineHeight,
+    nameMargin,
+    rootFontSize
+  );
   return htmlContent;
 };
 
-const renderDataColumns = (names) => {
+const renderDataColumns = (
+  names,
+  nameFontSize,
+  nameLineHeight,
+  nameMargin,
+  rootFontSize
+) => {
   const nameColumns = splitNamesIntoColumns(names);
+
+  const nameStyle = {
+    fontSize: `${nameFontSize / rootFontSize}rem`,
+    lineHeight: nameLineHeight / nameFontSize,
+    marginBottom: `${nameMargin / rootFontSize}rem`,
+  };
 
   return nameColumns.map((column, index) => (
     <div key={index} className="column">
@@ -161,6 +203,7 @@ const renderDataColumns = (names) => {
         <div
           key={nameIndex}
           className="name"
+          style={nameStyle}
           dangerouslySetInnerHTML={{ __html: name }}
         ></div>
       ))}
@@ -182,6 +225,11 @@ const splitNamesIntoColumns = (data) => {
       columns.push(column);
     }
 
+    while (columns.length < 3) {
+      const col = [];
+      columns.push(col);
+    }
+
     return columns;
   };
   const sortedNamesObjectKeys = Object.keys(data).sort();
@@ -193,4 +241,92 @@ const splitNamesIntoColumns = (data) => {
   return allColumns;
 };
 
-export default App;
+const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
+  // console.log('InfoColumn: ', allDataSetKeys, activeKeyIndex, data, level)
+
+  const getCampaignDescription = () => {
+    const currentCampaignDesc = he.decode(
+      data[allDataSetKeys[activeKeyIndex]]["campaignInfo"][0]["description"]
+    );
+    const descParts = currentCampaignDesc.split("|");
+
+    const desc = descParts.join("<br />");
+
+    return desc;
+  };
+
+  const getDsetsAndLevels = () => {
+    return allDataSetKeys.map((dskey, index) => {
+      const isActive = index === activeKeyIndex;
+      const subDataSet = data[allDataSetKeys[index]];
+      const campaignInfoData = subDataSet["campaignInfo"][0];
+      const levelData = subDataSet["levels"][level];
+      return (
+        <div key={index} className={isActive ? "active" : ""}>
+          <h2 className="set-title">
+            {campaignInfoData["title"] ? campaignInfoData["title"] : ""}
+          </h2>
+          {isActive ? (
+            <>
+              <h3 className="level-title">
+                {levelData["title"] ? levelData["title"] : ""}
+              </h3>
+              {/*<h4 className="level-desc">
+                {levelData["description"] ? levelData["description"] : ""}
+          </h4>*/}
+            </>
+          ) : null}
+        </div>
+      );
+    });
+  };
+
+  return (
+    <React.Fragment>
+      <div class="header-bar">
+        <div class="main-header-text">
+          <h1>With Thanks</h1>
+        </div>
+        <div class="secondary-header-text">
+          <div class="sub-headings">
+            <h2>
+              {data[allDataSetKeys[activeKeyIndex]]["campaignInfo"][0]["title"]}
+            </h2>
+            <h2>
+              {data[allDataSetKeys[activeKeyIndex]]["levels"][level]["title"]}
+            </h2>
+          </div>
+          <div
+            class="description"
+            dangerouslySetInnerHTML={{
+              __html:
+                data[allDataSetKeys[activeKeyIndex]]["campaignInfo"][0][
+                  "description"
+                ],
+            }}
+          ></div>
+        </div>
+      </div>
+
+      {/*<div className="column top-col">
+        <h1 className="main-title">With Thanks</h1>
+        <p
+          className="main-desc"
+          dangerouslySetInnerHTML={{
+            __html: getCampaignDescription(),
+          }}
+        ></p>
+
+        {getDsetsAndLevels()}
+
+        {/*
+        <div className="footer">
+          <img src={Logo} alt="NMWA Logo" />
+        </div>
+      * /}
+    </div> */}
+    </React.Fragment>
+  );
+};
+
+export default ScreenTwo;
