@@ -11,11 +11,10 @@ import he from "he";
 import "./ScreenTwo.scss";
 
 const ScreenTwo = ({ data }) => {
-  console.log(data);
   const [allDataSetKeys] = useState(["space-to-soar"]);
   const [level, setLevel] = useState(0);
   const [dataSetKeyIndex, setDataSetKeyIndex] = useState(0);
-  const [rootFontSize, setRootFontSize] = useState(100);
+  const [rootFontSize, setRootFontSize] = useState(10);
   const datasetkey = allDataSetKeys[dataSetKeyIndex];
   const levelLength = data[datasetkey]["levels"].length;
 
@@ -59,7 +58,7 @@ const ScreenTwo = ({ data }) => {
             startDelay={0}
             endDelay={2000}
             onComplete={onComplete}
-            speed={35}
+            speed={150}
             fadeInOutDuration={1.5}
             rootFontSize={rootFontSize}
           >
@@ -78,16 +77,18 @@ const AutoScrollingComponent = ({
   startDelay = 0,
   endDelay = 2000,
   onComplete,
-  speed = 35,
+  speed = 70,
   fadeInOutDuration = 1.5,
   rootFontSize,
 }) => {
   const containerRef = useRef(null);
   useEffect(() => {
     const animationSpeed = speed;
+    const yOffset = 24;
     let columnHeight = containerRef.current.offsetHeight;
     columnHeight =
       columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
+
     const finalY = -columnHeight + window.innerHeight;
     const bottomToTopDuration = (finalY * -1 * animationSpeed) / 10000;
     const isRightToLeft = finalY === 0;
@@ -110,33 +111,37 @@ const AutoScrollingComponent = ({
         tl.fromTo(
           containerRef.current,
           {
-            y: "2rem",
+            y: `${yOffset}rem`,
             x: startX,
             duration: fadeInOutDuration,
             ease: "linear",
             opacity: 0,
           },
           {
-            y: "2rem",
+            y: `${yOffset}rem`,
             x: 0,
             opacity: 1,
           }
         );
       } else {
         tl.to(containerRef.current, {
+          y: `${yOffset}rem`,
           duration: fadeInOutDuration,
           opacity: 1,
           ease: "none",
         });
-        tl.from(containerRef.current, {
-          y: "2rem",
-        });
-        tl.to(containerRef.current, {
-          duration: bottomToTopDuration,
-          y: finalY,
-          ease: "linear",
-          paused: false,
-        });
+        tl.fromTo(
+          containerRef.current,
+          {
+            y: `${yOffset}rem`,
+          },
+          {
+            duration: bottomToTopDuration,
+            y: finalY,
+            ease: "linear",
+            paused: false,
+          }
+        );
       }
 
       tl.play();
@@ -168,10 +173,6 @@ const renderHtml = (data, datasetkey, level, rootFontSize) => {
   const nameFontSize = data[datasetkey]["levels"][level]["fontSize"];
   const nameLineHeight = data[datasetkey]["levels"][level]["leading"];
   const nameMargin = data[datasetkey]["levels"][level]["paragraphSpacing"];
-  // console.log(
-  //   "count of names: ",
-  //   Object.keys(data[datasetkey]["levels"][level]["names"]).length
-  // );
   const htmlContent = renderDataColumns(
     levelNames,
     nameFontSize,
@@ -192,9 +193,9 @@ const renderDataColumns = (
   const nameColumns = splitNamesIntoColumns(names);
 
   const nameStyle = {
-    fontSize: `${nameFontSize / rootFontSize}rem`,
+    fontSize: `${nameFontSize / (2 * rootFontSize)}rem`,
     lineHeight: nameLineHeight / nameFontSize,
-    marginBottom: `${nameMargin / rootFontSize}rem`,
+    marginBottom: `${nameMargin / (2 * rootFontSize)}rem`,
   };
 
   return nameColumns.map((column, index) => (
@@ -225,11 +226,6 @@ const splitNamesIntoColumns = (data) => {
       columns.push(column);
     }
 
-    while (columns.length < 3) {
-      const col = [];
-      columns.push(col);
-    }
-
     return columns;
   };
   const sortedNamesObjectKeys = Object.keys(data).sort();
@@ -244,88 +240,31 @@ const splitNamesIntoColumns = (data) => {
 const InfoColumn = ({ allDataSetKeys, activeKeyIndex, data, level }) => {
   // console.log('InfoColumn: ', allDataSetKeys, activeKeyIndex, data, level)
 
-  const getCampaignDescription = () => {
-    const currentCampaignDesc = he.decode(
-      data[allDataSetKeys[activeKeyIndex]]["campaignInfo"][0]["description"]
-    );
-    const descParts = currentCampaignDesc.split("|");
-
-    const desc = descParts.join("<br />");
-
-    return desc;
-  };
-
-  const getDsetsAndLevels = () => {
-    return allDataSetKeys.map((dskey, index) => {
-      const isActive = index === activeKeyIndex;
-      const subDataSet = data[allDataSetKeys[index]];
-      const campaignInfoData = subDataSet["campaignInfo"][0];
-      const levelData = subDataSet["levels"][level];
-      return (
-        <div key={index} className={isActive ? "active" : ""}>
-          <h2 className="set-title">
-            {campaignInfoData["title"] ? campaignInfoData["title"] : ""}
-          </h2>
-          {isActive ? (
-            <>
-              <h3 className="level-title">
-                {levelData["title"] ? levelData["title"] : ""}
-              </h3>
-              {/*<h4 className="level-desc">
-                {levelData["description"] ? levelData["description"] : ""}
-          </h4>*/}
-            </>
-          ) : null}
-        </div>
-      );
-    });
-  };
-
   return (
-    <React.Fragment>
-      <div class="header-bar">
-        <div class="main-header-text">
-          <h1>With Thanks</h1>
-        </div>
-        <div class="secondary-header-text">
-          <div class="sub-headings">
-            <h2>
-              {data[allDataSetKeys[activeKeyIndex]]["campaignInfo"][0]["title"]}
-            </h2>
-            <h2>
-              {data[allDataSetKeys[activeKeyIndex]]["levels"][level]["title"]}
-            </h2>
-          </div>
-          <div
-            class="description"
-            dangerouslySetInnerHTML={{
-              __html:
-                data[allDataSetKeys[activeKeyIndex]]["campaignInfo"][0][
-                  "description"
-                ],
-            }}
-          ></div>
-        </div>
+    <div className="header-bar">
+      <div className="main-header-text">
+        <h1>With Thanks</h1>
       </div>
-
-      {/*<div className="column top-col">
-        <h1 className="main-title">With Thanks</h1>
-        <p
-          className="main-desc"
-          dangerouslySetInnerHTML={{
-            __html: getCampaignDescription(),
-          }}
-        ></p>
-
-        {getDsetsAndLevels()}
-
-        {/*
-        <div className="footer">
-          <img src={Logo} alt="NMWA Logo" />
+      <div className="secondary-header-text">
+        <div className="sub-headings">
+          <h2>
+            {data[allDataSetKeys[activeKeyIndex]]["campaignInfo"][0]["title"]}
+          </h2>
+          <h2>
+            {data[allDataSetKeys[activeKeyIndex]]["levels"][level]["title"]}
+          </h2>
         </div>
-      * /}
-    </div> */}
-    </React.Fragment>
+        <div
+          className="description"
+          dangerouslySetInnerHTML={{
+            __html:
+              data[allDataSetKeys[activeKeyIndex]]["campaignInfo"][0][
+                "description"
+              ],
+          }}
+        ></div>
+      </div>
+    </div>
   );
 };
 

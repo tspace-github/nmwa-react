@@ -12,11 +12,10 @@ import he from "he";
 import "./ScreenOne.scss";
 
 const ScreenOne = ({ data }) => {
-  console.log(data);
   const [allDataSetKeys] = useState(["cumulative", "2023-donors"]);
   const [level, setLevel] = useState(0);
   const [dataSetKeyIndex, setDataSetKeyIndex] = useState(0);
-  const [rootFontSize, setRootFontSize] = useState(100);
+  const [rootFontSize, setRootFontSize] = useState(10);
   const datasetkey = allDataSetKeys[dataSetKeyIndex];
   const levelLength = data[datasetkey]["levels"].length;
 
@@ -86,6 +85,7 @@ const AutoScrollingComponent = ({
   const containerRef = useRef(null);
   useEffect(() => {
     const animationSpeed = speed;
+    const yOffset = 20;
     let columnHeight = containerRef.current.offsetHeight;
     columnHeight =
       columnHeight > window.innerHeight ? columnHeight : window.innerHeight;
@@ -98,7 +98,6 @@ const AutoScrollingComponent = ({
       const tl = gsap.timeline({
         delay: startDelay / 1000,
         onComplete: () => {
-          // console.log("oncomplete");
           if (typeof onComplete === "function") {
             setTimeout(() => {
               onComplete();
@@ -111,14 +110,14 @@ const AutoScrollingComponent = ({
         tl.fromTo(
           containerRef.current,
           {
-            y: "2rem",
+            y: `${yOffset}rem`,
             x: startX,
             duration: fadeInOutDuration,
             ease: "linear",
             opacity: 0,
           },
           {
-            y: "2rem",
+            y: `${yOffset}rem`,
             x: 0,
             opacity: 1,
           }
@@ -129,15 +128,19 @@ const AutoScrollingComponent = ({
           opacity: 1,
           ease: "none",
         });
-        tl.from(containerRef.current, {
-          y: "2rem",
-        });
-        tl.to(containerRef.current, {
-          duration: bottomToTopDuration,
-          y: finalY,
-          ease: "linear",
-          paused: false,
-        });
+        tl.fromTo(
+          containerRef.current,
+          {
+            y: `${yOffset}rem`,
+          },
+
+          {
+            duration: bottomToTopDuration,
+            y: finalY,
+            ease: "linear",
+            paused: false,
+          }
+        );
       }
 
       tl.play();
